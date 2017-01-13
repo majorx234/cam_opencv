@@ -1,0 +1,1 @@
+C++ Project for getting expierence in camer interface and OpenCV
