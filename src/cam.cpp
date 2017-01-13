@@ -1,7 +1,7 @@
 #include "cam.h"
 #include <stdio.h>
 
-cam::cam(int cam_nr)
+Cam::Cam(int cam_nr)
 {
 
 
@@ -10,18 +10,18 @@ cam::cam(int cam_nr)
 
 }
 
-cam::~cam()
+Cam::~Cam()
 {
   printf("cam zerstörrt\n");
 }
 
-int cam::getFrame(cv::Mat &image)
+int Cam::getFrame(cv::Mat &image)
 {
   cap >> image;
   return 0;
 }
 
-void cam::test()
+void Cam::test()
 {
   printf("cam da\n");
 }

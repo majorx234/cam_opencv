@@ -7,15 +7,15 @@
 #include "opencv2/opencv.hpp"
 
 
-class cam
+class Cam
 {
 private:
   cv::VideoCapture cap;
 
 
 public: 
-  cam(int cam_nr);
-  ~cam(); 
+  Cam(int cam_nr);
+  ~Cam(); 
   int getFrame(cv::Mat &image);
   void test();
 
