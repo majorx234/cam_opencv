@@ -14,7 +14,7 @@ private:
 
 
 public: 
-  Cam(int cam_nr);
+  explicit Cam(int cam_nr);
   ~Cam(); 
   int getFrame(cv::Mat &image);
   void test();
