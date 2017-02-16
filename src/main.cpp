@@ -77,7 +77,7 @@ int threadGetImageSetOut(Cam &mycam, Filter &myfilter, QtDisplayParametersWindow
     myfilter.normalize(cutted,cutted2);
     tmp_image = cvmat2qimage( cutted2 );
     mein_fenster.setBild(tmp_image);
-    //cv::waitKey(20);
+    
   }
   return 0;
 }
