@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <mutex>
 #include <condition_variable>
+#include <QGraphicsPixmapItem>
 
 class QtDisplayParametersWindow : public QMainWindow
 {
@@ -20,7 +21,8 @@ public:
   explicit QtDisplayParametersWindow(QWidget *parent = Q_NULLPTR);
   ~QtDisplayParametersWindow();    
   double getParameter();
-  void setBild(QImage bild);
+  void setBild(QImage &bild);
+  void setBildLockFree(QImage &newBild);
   void close();
 
 private:
@@ -33,7 +35,12 @@ private:
   QTimer*screenRefreshTimer;
   double parameter;
   
+  QGraphicsPixmapItem* pixmapItem;
   QImage bild;
+  QImage bildLockFree[3];
+  std::atomic<int> lastImage{0};
+  int penultimateImage{0}; 
+  std::atomic<int> readImage{0};
   std::mutex bildMutex;
   std::condition_variable bildCV;
 
@@ -46,6 +53,9 @@ private slots:
   void on_closebutton_clicked();   
   void pullNewFrame();
   void on_new_parameter_clicked();
+  void pullNewFrameLockFree();
+
+
 
  
 

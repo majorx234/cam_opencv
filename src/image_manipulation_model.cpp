@@ -67,6 +67,7 @@ int ImageManipulationModel::getImage(cv::Mat& manipulatedImage)
   {
     std::unique_lock<std::mutex> lock(imageMutex);
     // image read
+    manipulatedImage.release();
     manipulatedImage = image.clone();
     imageWritten = 0;
   }
@@ -82,6 +83,7 @@ int ImageManipulationModel::setImage(cv::Mat& inputImage)
   {
     std::unique_lock<std::mutex> lock(imageMutex);
     //imagewrite
+    image.release();
     image = inputImage.clone();
     imageWritten = 1;
   }

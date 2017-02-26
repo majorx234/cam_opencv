@@ -43,17 +43,21 @@ int QtCamOpenCvController::QtCamOpenCvControllerFunction()
   ManipulationParameter params;
 
   //cam_filter_obj.getParameter(params);
-  cv::Mat src;
-  QImage dst;
+  
+  
   int test = abbrechen;
 
   while(!abbrechen)
   { 
+    cv::Mat src;
+    QImage dst;
     display_obj.getParameter(params);
     cam_filter_obj.setParameter(params);
     cam_filter_obj.getImage( src );
+    
     dst = cvmat2qimage( src );
     display_obj.setImage( dst );
+
     if(display_obj.isClosed())
       abbrechen = 1; 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));

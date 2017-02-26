@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 
 QtDisplayParametersWindow::QtDisplayParametersWindow(QWidget *parent) : QMainWindow(parent),
+                                                                        pixmapItem(NULL),
                                                                         bildReadingRequest(false)
 {
 
@@ -33,8 +34,8 @@ QtDisplayParametersWindow::QtDisplayParametersWindow(QWidget *parent) : QMainWin
   screenRefreshTimer->setInterval(50);
   screenRefreshTimer->setSingleShot(false);
   connect(closeButton, SIGNAL(clicked()),this, SLOT(on_closebutton_clicked()) );
-  connect(newFrameButton, SIGNAL(clicked()),this, SLOT(pullNewFrame()) );
-  connect(screenRefreshTimer, SIGNAL(timeout()),this, SLOT(pullNewFrame()) );
+  connect(newFrameButton, SIGNAL(clicked()),this, SLOT(pullNewFrameLockFree()) );
+  connect(screenRefreshTimer, SIGNAL(timeout()),this, SLOT(pullNewFrameLockFree()) );
   connect(newParameter,SIGNAL(clicked()),this,SLOT(on_new_parameter_clicked()));
   //connect(parameterBox,SIGNAL(editingFinished()),this,SLOT(on_new_parameter_clicked()));
   screenRefreshTimer->start();
@@ -63,10 +64,18 @@ void QtDisplayParametersWindow::pullNewFrame()
 
   std::unique_lock<std::mutex> lock(bildMutex);
   QPixmap pixmap( QPixmap::fromImage(bild));
-  scene->addPixmap(pixmap);
+  if(!pixmapItem)
+  {
+    pixmapItem  = scene->addPixmap(pixmap);
+  }
+  else
+  {
+    pixmapItem->setPixmap(pixmap);
+  }
   printf("image putted in scene\n");
   bildReadingRequest = false;
   bildReadingRequestCV.notify_one();
+
 }
 
 void QtDisplayParametersWindow::on_new_parameter_clicked()  
@@ -79,9 +88,9 @@ double QtDisplayParametersWindow::getParameter()
   return parameter;
 }
 
-void QtDisplayParametersWindow::setBild(QImage newBild)
+void QtDisplayParametersWindow::setBild(QImage &newBild)
 {
-  static int i;
+  static int bild_count;
   {
     //
     printf("mutex??\n");
@@ -99,10 +108,52 @@ void QtDisplayParametersWindow::setBild(QImage newBild)
     bild = newBild;
     bildReadingRequestCV.notify_one();  
   }
-  i++;
-  printf("QtDisplayParametersWindow::setBild(): new image set by Controller %d \n",i);
+  bild_count++;
+  printf("QtDisplayParametersWindow::setBild(): new image set by Controller %d \n",bild_count);
 }
 
+void QtDisplayParametersWindow::pullNewFrameLockFree()
+{
+  int tmp_read_image = lastImage;
+  readImage = tmp_read_image;
+  QPixmap pixmap( QPixmap::fromImage(bildLockFree[lastImage]));
+  int temp_last_image = lastImage;
+  printf("pullNewFrameLockFree: %d\n",temp_last_image);
+  if(!pixmapItem)
+  {
+    pixmapItem  = scene->addPixmap(pixmap);
+  }
+  else
+  {
+    pixmapItem->setPixmap(pixmap);
+  }
+} 
+void QtDisplayParametersWindow::setBildLockFree(QImage &newBild)
+{
+  printf("setBildLockFree start %d\n");
+ for(int i = 0;i<3;i++)
+ {
+  if((i!=lastImage)&&(i!=penultimateImage))
+  {
+    if(readImage != i)
+    {
+      bildLockFree[i] = newBild;
+      penultimateImage  = lastImage;
+      lastImage = i;
+    }
+    else
+    {  
+      bildLockFree[penultimateImage] = newBild;
+      int tmp = penultimateImage;
+      penultimateImage  = lastImage;
+      lastImage = tmp;
+    }
+    
+    
+    break;
+  }
+ }
+}
 void QtDisplayParametersWindow::close()
 {
   on_closebutton_clicked(); 

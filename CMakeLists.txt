@@ -51,6 +51,7 @@ set(CAM_SOURCES
 
 set(FILTER_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/filter.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/local_binary_pattern.cpp
 
 )
 

@@ -14,7 +14,7 @@ public:
   explicit QtImageView(int &new_argc, char **new_argv);
   ~QtImageView();
 
-  int setImage(QImage bild);
+  int setImage(QImage &bild);
   int getParameter(ManipulationParameter &params);
   int isClosed();
   void stop();

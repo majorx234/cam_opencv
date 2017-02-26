@@ -13,10 +13,11 @@ QtImageView::~QtImageView()
   qtImageViewThread.join();
 }
 
-int QtImageView::setImage(QImage bild)
+int QtImageView::setImage(QImage &bild)
 {
+  printf("QtImageView::setImage: call sezBildLockFree()\n");
   if(myWindow)
-    myWindow->setBild(bild);
+    myWindow->setBildLockFree(bild);
   return 0;
 }
 

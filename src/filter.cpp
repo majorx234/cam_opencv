@@ -94,3 +94,33 @@ int Filter::colorFilter(cv::Mat &in,cv::Mat &out)
 	// zusammenführung zu farbbild
 	merge(bgr, 3, out);
 }
+
+
+int Filter::apply_image_process(const cv::Mat &in, cv::Mat &out)
+{
+	int error = 0;
+  if(image_processes.size() == 0)
+  {
+ 	  out=in;
+    return 0;
+  } 
+  cv::Mat tmp_in = in;
+  cv::Mat tmp_out;
+  for(std::vector<image_process>::iterator it = image_processes.begin();it != image_processes.end();++it)
+  {
+  	error = it->apply_image_process(tmp_in,tmp_out);
+  	if(error)
+  	{
+  		return error;
+  	}
+  	tmp_in = tmp_out;
+  }	
+  out = tmp_out;
+  return error;
+} 
+
+int Filter::add_image_process(image_process new_process)
+{
+  image_processes.push_back(new_process);
+  return image_processes.size();
+}
