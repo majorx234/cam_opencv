@@ -1,5 +1,5 @@
 #include "image_manipulation_model.h"
-
+#include "local_binary_pattern.h"
 ImageManipulationModel::ImageManipulationModel() :  myCam(0), 
                                                     myFilter(), 
                                                     abbrechen(0), 
@@ -26,16 +26,21 @@ ImageManipulationModel::~ImageManipulationModel()
 
 int ImageManipulationModel::imageManipulationLoopFunction()
 {
-  cv::Mat src, blurred, edges, cutted, cutted2;
+  cv::Mat src, blurred, edges, cutted, cutted2, dst;
   ManipulationParameter myParams;
+
+
+  local_binary_pattern local_binary_pattern_obj;
+  local_binary_pattern_obj.set_parameter(0,0,true,2);
+  //myFilter.add_image_process(local_binary_pattern_obj);
 
   while(abbrechen == 0)
   {
-
+    int error = 0;
     
     myCam.getFrame(src);
    
-   
+   /*
     myFilter.medianBlurFilter(src,blurred);
     getParameter(myParams);   
     //willItWork.drawLine(image, blurred, 20, 40, 200, 400);
@@ -46,7 +51,15 @@ int ImageManipulationModel::imageManipulationLoopFunction()
       myParams.lowerValue,
       myParams.upperValue);
     myFilter.normalize(cutted,cutted2);
-    setImage(cutted2);
+    */
+    //error = myFilter.apply_image_process(src,dst);
+    cv::Mat monochrom_in;
+    cv::cvtColor(src, monochrom_in, CV_RGB2GRAY);
+
+    error = local_binary_pattern_obj.apply_image_process(monochrom_in, dst);
+    if(error)
+      printf("error in ImageManipulationModel\n");
+    setImage(dst);
    }
 
   return 0;

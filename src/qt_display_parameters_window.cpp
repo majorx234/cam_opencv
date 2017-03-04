@@ -34,8 +34,12 @@ QtDisplayParametersWindow::QtDisplayParametersWindow(QWidget *parent) : QMainWin
   screenRefreshTimer->setInterval(50);
   screenRefreshTimer->setSingleShot(false);
   connect(closeButton, SIGNAL(clicked()),this, SLOT(on_closebutton_clicked()) );
-  connect(newFrameButton, SIGNAL(clicked()),this, SLOT(pullNewFrameLockFree()) );
-  connect(screenRefreshTimer, SIGNAL(timeout()),this, SLOT(pullNewFrameLockFree()) );
+  //connect(newFrameButton, SIGNAL(clicked()),this, SLOT(pullNewFrameLockFree()) );
+  //connect(screenRefreshTimer, SIGNAL(timeout()),this, SLOT(pullNewFrameLockFree()) );
+  connect(newFrameButton, SIGNAL(clicked()),this, SLOT(pullNewFrame()) );
+  connect(screenRefreshTimer, SIGNAL(timeout()),this, SLOT(pullNewFrame()) );
+ 
+  
   connect(newParameter,SIGNAL(clicked()),this,SLOT(on_new_parameter_clicked()));
   //connect(parameterBox,SIGNAL(editingFinished()),this,SLOT(on_new_parameter_clicked()));
   screenRefreshTimer->start();
@@ -131,28 +135,28 @@ void QtDisplayParametersWindow::pullNewFrameLockFree()
 void QtDisplayParametersWindow::setBildLockFree(QImage &newBild)
 {
   printf("setBildLockFree start %d\n");
- for(int i = 0;i<3;i++)
- {
-  if((i!=lastImage)&&(i!=penultimateImage))
+  for(int i = 0;i<3;i++)
   {
-    if(readImage != i)
+    if((i!=lastImage)&&(i!=penultimateImage))
     {
-      bildLockFree[i] = newBild;
-      penultimateImage  = lastImage;
-      lastImage = i;
-    }
-    else
-    {  
-      bildLockFree[penultimateImage] = newBild;
-      int tmp = penultimateImage;
-      penultimateImage  = lastImage;
-      lastImage = tmp;
-    }
+      if(readImage != i)
+      {
+        bildLockFree[i] = newBild;
+        penultimateImage  = lastImage;
+        lastImage = i;
+      }
+      else
+      {   
+        bildLockFree[penultimateImage] = newBild;
+        int tmp = penultimateImage;
+        penultimateImage  = lastImage;
+        lastImage = tmp;
+      }
     
     
-    break;
+      break;
+    }
   }
- }
 }
 void QtDisplayParametersWindow::close()
 {
